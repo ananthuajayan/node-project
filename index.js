@@ -3,11 +3,27 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const product = require('./models/model')
-
+const path = require("path");
 // json middleware to convert data to json formate!-----------------
-app.use(express.json())
+app.use(express.json()) 
+ 
+// setting ejs------------------------
+
+app.set("view engine","ejs");
+
+
+app.use('/css', express.static(path.resolve(__dirname,"assets/css"))) 
+app.use('/js', express.static(path.resolve(__dirname,"assets/js"))) 
+app.use('/img', express.static(path.resolve(__dirname,"assets/img"))) 
+
 
 //get method to fech data from the database!----------------------
+
+app.get('/', (req,res) => {
+  res.render('main'); 
+})
+
+
 
 app.get('/products', async(req,res)=>{
    try{
@@ -21,7 +37,7 @@ app.get('/products', async(req,res)=>{
    }
 })
 // using is to get a specified data from the database!------------------------
-app.get('/products/:id',async(req,res)=>{
+app.get('/product/:id',async(req,res)=>{
     try{
         const {id}=req.params;
         const productid = await product.findById(id);
@@ -50,14 +66,13 @@ app.post('/product/', async(req, res) => {
   app.put('/product/:id',async(req,res)=>{
     try{
     const {id}=req.params;
-    const prod = await product.findByIdAndUpdate(id,req.body);
+    const zero = await product.findByIdAndUpdate(id,req.body);
 //if we cant find the id!-----
-    if(!product){
+    if(!zero){
        return res.status(404).json({message:`cannot findd any product with ${id}`});
      }
      const updated = await product.findById(id)
-     res.status(200).json(updated
-        )
+     res.status(200).json(updated)
     }
     catch(error){
         console.log(error.message);
